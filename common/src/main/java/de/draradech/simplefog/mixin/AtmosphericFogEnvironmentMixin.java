@@ -9,7 +9,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.AtmosphericFogEnvironment;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,9 +33,8 @@ public class AtmosphericFogEnvironmentMixin {
             float targetFogStartPercent = SimpleFogMain.config.overworldStart;
             float targetFogEndPercent = SimpleFogMain.config.overworldEnd;
             SimpleFogConfig.RainConfig rainConf = SimpleFogMain.config.rainConfig;
-            if (!rainConf.rainToggle) return;
 
-            if (clientLevel.isRaining()) {
+            if (rainConf.rainToggle && clientLevel.isRaining()) {
                 BlockPos blockPos = camera.blockPosition();
                 boolean skylight = blockPos.getY() >= clientLevel.getHeight(Heightmap.Types.WORLD_SURFACE, blockPos.getX(), blockPos.getZ());
                 targetFogStartPercent = skylight ? rainConf.rainStart : rainConf.rainStartIndoor;
