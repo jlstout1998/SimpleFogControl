@@ -26,6 +26,14 @@ public class AtmosphericFogEnvironmentMixin {
         return current < target ? Math.min(target, current + step) : Math.max(target, current - step);
     }
 
+    private static float voxyEnd(float start, float density, float viewDistance)
+    {
+        float voxyFarDistance = (float)Math.sqrt(3) * Math.max(viewDistance, 20 * 16.0f);
+        float intervalToFar = voxyFarDistance - start;
+        float intervalToEnd = intervalToFar / (density * 0.01f);
+        return start + intervalToEnd;
+    }
+
     @Inject(at = @At("TAIL"), method = "setupFog(Lnet/minecraft/client/renderer/fog/FogData;Lnet/minecraft/client/Camera;Lnet/minecraft/client/multiplayer/ClientLevel;FLnet/minecraft/client/DeltaTracker;)V")
     public void tailSetupFog(FogData fogData, Camera camera, ClientLevel clientLevel, float viewDistance, DeltaTracker deltaTracker, CallbackInfo ci)
     {
@@ -44,32 +52,42 @@ public class AtmosphericFogEnvironmentMixin {
 
                 float rainStartPerc = Mth.lerp(currentIndoorFactor, rainConf.rainStart, rainConf.rainStartIndoor);
                 float envStartPerc = Mth.lerp(currentRainFactor, config.overworldStart, rainStartPerc);
-                float envEndPerc = Mth.lerp(currentRainFactor, config.overworldEnd, rainConf.rainEnd);
                 float cloudEndClear = Minecraft.getInstance().options.cloudRange().get() * 16.0f;
                 float cloudEndRain = cloudEndClear * rainConf.rainEnd / config.overworldEnd;
                 fogData.environmentalStart = viewDistance * envStartPerc * 0.01f;
-                fogData.environmentalEnd = viewDistance * envEndPerc * 0.01f;
                 fogData.cloudEnd = Mth.lerp(currentRainFactor, cloudEndClear, cloudEndRain);
+
+                float overworldEnd = viewDistance * config.overworldEnd * 0.01f;
+                if (config.overworldEndVoxy > 0.5f) overworldEnd = voxyEnd(fogData.environmentalStart, config.overworldEndVoxy, viewDistance);
+                float rainEnd = viewDistance * rainConf.rainEnd * 0.01f;
+                if (rainConf.rainEndVoxy > 0.5f) rainEnd = voxyEnd(fogData.environmentalStart, rainConf.rainEndVoxy, viewDistance);
+                fogData.environmentalEnd = Mth.lerp(currentRainFactor, overworldEnd, rainEnd);
             }
             else
             {
                 fogData.environmentalStart = viewDistance * config.overworldStart * 0.01f;
-                fogData.environmentalEnd = viewDistance * config.overworldEnd * 0.01f;
                 fogData.cloudEnd = Minecraft.getInstance().options.cloudRange().get() * 16.0f;
+                float overworldEnd = viewDistance * config.overworldEnd * 0.01f;
+                if (config.overworldEndVoxy > 0.5f) overworldEnd = voxyEnd(fogData.environmentalStart, config.overworldEndVoxy, viewDistance);
+                fogData.environmentalEnd = overworldEnd;
             }
             fogData.skyEnd = Math.min(fogData.environmentalEnd, viewDistance);
         }
         else if (config.netherToggle && clientLevel.dimension() == Level.NETHER)
         {
             fogData.environmentalStart = viewDistance * config.netherStart * 0.01f;
-            fogData.environmentalEnd = viewDistance * config.netherEnd * 0.01f;
+            float netherEnd = viewDistance * config.netherEnd * 0.01f;
+            if (config.netherEndVoxy > 0.5f) netherEnd = voxyEnd(fogData.environmentalStart, config.netherEndVoxy, viewDistance);
+            fogData.environmentalEnd = netherEnd;
             fogData.cloudEnd = fogData.environmentalEnd;
             fogData.skyEnd = fogData.environmentalEnd;
         }
         else if (config.endToggle && clientLevel.dimension() == Level.END)
         {
             fogData.environmentalStart = viewDistance * config.endStart * 0.01f;
-            fogData.environmentalEnd = viewDistance * config.endEnd * 0.01f;
+            float endEnd = viewDistance * config.endEnd * 0.01f;
+            if (config.endEndVoxy > 0.5f) endEnd = voxyEnd(fogData.environmentalStart, config.endEndVoxy, viewDistance);
+            fogData.environmentalEnd = endEnd;
             fogData.cloudEnd = fogData.environmentalEnd;
             fogData.skyEnd = fogData.environmentalEnd;
         }

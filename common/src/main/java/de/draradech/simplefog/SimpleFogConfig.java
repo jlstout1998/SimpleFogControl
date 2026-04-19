@@ -12,6 +12,7 @@ public class SimpleFogConfig implements ConfigData {
         public float rainStart = 0.0f;
         public float rainStartIndoor = 25.0f;
         public float rainEnd = 110.0f;
+        public float rainEndVoxy = 0.0f;
         public float rainFogApplySpeed = 1.0f;
     }
 
@@ -22,6 +23,8 @@ public class SimpleFogConfig implements ConfigData {
     @ConfigEntry.Category(value = "overworld")
     public float overworldEnd = 130.0f;
     @ConfigEntry.Category(value = "overworld")
+    public float overworldEndVoxy = 0.0f;
+    @ConfigEntry.Category(value = "overworld")
     @ConfigEntry.Gui.CollapsibleObject
     public RainConfig rainConfig = new RainConfig();
 
@@ -31,6 +34,8 @@ public class SimpleFogConfig implements ConfigData {
     public float netherStart = 5.0f;
     @ConfigEntry.Category(value = "nether")
     public float netherEnd = 80.0f;
+    @ConfigEntry.Category(value = "nether")
+    public float netherEndVoxy = 0.0f;
 
     @ConfigEntry.Category(value = "end")
     public boolean endToggle = true;
@@ -38,6 +43,8 @@ public class SimpleFogConfig implements ConfigData {
     public float endStart = 70.0f;
     @ConfigEntry.Category(value = "end")
     public float endEnd = 130.0f;
+    @ConfigEntry.Category(value = "end")
+    public float endEndVoxy = 0.0f;
 
     @ConfigEntry.Category(value = "water")
     public boolean waterToggle = true;
