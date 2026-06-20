@@ -18,7 +18,7 @@ public final class DimensionClassifier {
 
     public static boolean isNetherLike(ClientLevel level) {
         DimensionType t = type(level);
-        return !t.hasSkyLight() && t.hasCeiling();
+        return !t.hasSkyLight() && t.hasCeiling() && !t.hasEnderDragonFight();
     }
 
     public static boolean isEndLike(ClientLevel level) {
