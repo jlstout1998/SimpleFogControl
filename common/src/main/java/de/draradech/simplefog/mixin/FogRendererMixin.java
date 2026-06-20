@@ -1,7 +1,9 @@
 package de.draradech.simplefog.mixin;
 
 import de.draradech.simplefog.SimpleFogMain;
+import de.draradech.simplefog.util.DimensionClassifier;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.world.level.Level;
@@ -12,11 +14,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(FogRenderer.class)
 public class FogRendererMixin {
-    private boolean active()
-    {
-        if (!SimpleFogMain.config.overworldToggle && Minecraft.getInstance().player.level().dimension() == Level.OVERWORLD) return false;
-        if (!SimpleFogMain.config.netherToggle && Minecraft.getInstance().player.level().dimension() == Level.NETHER) return false;
-        if (!SimpleFogMain.config.endToggle && Minecraft.getInstance().player.level().dimension() == Level.END) return false;
+    private boolean active() {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level == null) return false;
+        if (!SimpleFogMain.config.overworldToggle && DimensionClassifier.isOverworldLike(level)) return false;
+        if (!SimpleFogMain.config.netherToggle && DimensionClassifier.isNetherLike(level)) return false;
+        if (!SimpleFogMain.config.endToggle && DimensionClassifier.isEndLike(level)) return false;
         return true;
     }
 
