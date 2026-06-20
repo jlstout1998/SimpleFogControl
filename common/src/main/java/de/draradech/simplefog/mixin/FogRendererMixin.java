@@ -14,9 +14,17 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class FogRendererMixin {
     private boolean active()
     {
-        if (!SimpleFogMain.config.overworldToggle && Minecraft.getInstance().level().dimension() == Level.OVERWORLD) return false;
+        Level level = Minecraft.getInstance().level;
+        
+        if (level == null) return false;
+        if (!SimpleFogMain.config.overworldToggle && level.dimension() == Level.OVERWORLD) return false;
+        if (!SimpleFogMain.config.netherToggle && level.dimension() == Level.NETHER) return false;
+        if (!SimpleFogMain.config.endToggle && level.dimension() == Level.END) return false;
+        /*
+        if (!SimpleFogMain.config.overworldToggle && Minecraft.getInstance()player..level().dimension() == Level.OVERWORLD) return false;
         if (!SimpleFogMain.config.netherToggle && Minecraft.getInstance().player.level().dimension() == Level.NETHER) return false;
         if (!SimpleFogMain.config.endToggle && Minecraft.getInstance().player.level().dimension() == Level.END) return false;
+        */
         return true;
     }
 
