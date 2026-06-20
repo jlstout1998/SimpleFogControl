@@ -2,6 +2,7 @@ package de.draradech.simplefog.mixin;
 
 import de.draradech.simplefog.SimpleFogConfig;
 import de.draradech.simplefog.SimpleFogMain;
+import de.draradech.simplefog.util.DimensionClassifier;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -38,7 +39,7 @@ public class AtmosphericFogEnvironmentMixin {
     public void tailSetupFog(FogData fogData, Camera camera, ClientLevel clientLevel, float viewDistance, DeltaTracker deltaTracker, CallbackInfo ci)
     {
         SimpleFogConfig config = SimpleFogMain.config;
-        if (config.overworldToggle && clientLevel.dimension() == Level.OVERWORLD)
+        if (config.overworldToggle && DimensionClassifier.isOverworldLike(clientLevel))
         {
             SimpleFogConfig.RainConfig rainConf = config.rainConfig;
 
@@ -73,7 +74,7 @@ public class AtmosphericFogEnvironmentMixin {
             }
             fogData.skyEnd = Math.min(fogData.environmentalEnd, viewDistance);
         }
-        else if (config.netherToggle && clientLevel.dimension() == Level.NETHER)
+        else if (config.netherToggle && DimensionClassifier.isNetherLike(clientLevel))
         {
             fogData.environmentalStart = viewDistance * config.netherStart * 0.01f;
             float netherEnd = viewDistance * config.netherEnd * 0.01f;
@@ -82,7 +83,7 @@ public class AtmosphericFogEnvironmentMixin {
             fogData.cloudEnd = fogData.environmentalEnd;
             fogData.skyEnd = fogData.environmentalEnd;
         }
-        else if (config.endToggle && clientLevel.dimension() == Level.END)
+        else if (config.endToggle && DimensionClassifier.isEndLike(clientLevel))
         {
             fogData.environmentalStart = viewDistance * config.endStart * 0.01f;
             float endEnd = viewDistance * config.endEnd * 0.01f;
